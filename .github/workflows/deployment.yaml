@@ -1,0 +1,39 @@
+name: Deployment
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  dist_linux:
+    runs-on: ubuntu-latest
+    container:
+      image: crystallang/crystal:latest-alpine
+    steps:
+    - uses: actions/checkout@v2
+    - name: Update Libs
+      run: apk add --update --upgrade --no-cache --force-overwrite libxml2-dev yaml-dev
+    - name: Build
+      run: |
+        shards build --production --release --static --no-debug
+        strip ./bin/crystal-gchat-server
+        strip ./bin/change-passwords
+    - name: Upload
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./bin/crystal-gchat-server
+        asset_name: crystal-gchat-server-${{ github.event.release.tag_name }}-linux-x86_64
+        asset_content_type: binary/octet-stream
+    - name: Upload
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./bin/change-passwords
+        asset_name: change-passwords-${{ github.event.release.tag_name }}-linux-x86_64
+        asset_content_type: binary/octet-stream
