@@ -5,6 +5,7 @@ description: Custom encrypted chat with live drawing
 
 grade: stable
 confinement: strict
+base: core18
 
 apps:
   crystal-gchat-server:
