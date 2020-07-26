@@ -10,10 +10,12 @@ base: core18
 apps:
   crystal-gchat-server:
     command: bin/crystal-gchat-server
+    plugs:
+      - network
   change-passwords:
     command: bin/change-passwords
 
 parts:
-  source: ./
   crystal-gchat-server:
+    source: ./
     plugin: crystal
