@@ -13,5 +13,6 @@ apps:
     command: bin/change-passwords
 
 parts:
+  source: ./
   crystal-gchat-server:
     plugin: crystal
