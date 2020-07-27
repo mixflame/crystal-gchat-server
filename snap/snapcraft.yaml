@@ -19,3 +19,6 @@ parts:
   crystal-gchat-server:
     source: ./
     plugin: crystal
+    build-packages:
+      - git
+      - libssl-dev
