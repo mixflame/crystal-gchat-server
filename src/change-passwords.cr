@@ -1,7 +1,7 @@
 require "yaml"
 require "crypto/bcrypt/password"
 require "option_parser"
-require "atomic_write"
+# require "atomic_write"
 require "big"
 
 module Globals

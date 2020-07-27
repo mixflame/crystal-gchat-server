@@ -3,8 +3,8 @@ version: "1.0.5"
 summary: Crystal Lang GlobalChat2 Server
 description: Custom encrypted chat with live drawing
 
-grade: devel
-confinement: devmode
+grade: stable
+confinement: strict
 base: core18
 
 apps:
