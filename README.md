@@ -4,11 +4,19 @@ Asynchronous Chat and Drawing server
 
 ## Installation
 
-Install Crystal 0.35.1
+### Snap
 
-Optionally edit variables at the top of crystal-gchat-server.cr
+`snap install --beta crystal-gchat-server`
 
-Run `crystal src/crystal-gchat-server.cr`
+`crystal-gchat-server.change-passwords -i`
+
+`crystal-gchat-server`
+
+### Static x86 Binary
+
+Check releases for binaries. (<https://github.com/mixflame/crystal-gchat-server/releases>)
+
+Extract these to the same folder and follow release instructions.
 
 ## Usage
 
@@ -16,7 +24,11 @@ To be used with the GlobalChat2 client.
 
 ## Development
 
-Runs on Crystal 0.35.1 with no shards
+Install Crystal 0.35.1
+
+Run `crystal src/change-passwords.cr -i`
+
+Run `crystal src/crystal-gchat-server.cr`
 
 ## Contributing
 
