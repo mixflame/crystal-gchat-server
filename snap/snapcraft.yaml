@@ -1,5 +1,5 @@
 name: crystal-gchat-server
-version: "1.0.7"
+version: "1.0.8"
 summary: Crystal Lang GlobalChat2 Server
 description: Custom encrypted chat with live drawing
 
@@ -11,7 +11,7 @@ apps:
   crystal-gchat-server:
     command: bin/crystal-gchat-server
     plugs:
-      - network
+      - network-bind
       - home
   change-passwords:
     command: bin/change-passwords
