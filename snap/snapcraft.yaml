@@ -3,17 +3,22 @@ version: "1.0.3"
 summary: Crystal Lang GlobalChat2 Server
 description: Custom encrypted chat with live drawing
 
-grade: stable
-confinement: strict
+grade: devel
+confinement: devmode
 base: core18
 
 apps:
   crystal-gchat-server:
     command: bin/crystal-gchat-server
+    plugs:
+      - network
   change-passwords:
     command: bin/change-passwords
 
 parts:
-  source: ./
   crystal-gchat-server:
+    source: ./
     plugin: crystal
+    build-packages:
+      - git
+      - libssl-dev
