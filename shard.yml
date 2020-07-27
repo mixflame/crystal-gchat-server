@@ -10,8 +10,8 @@ description: |
   and secure E2E encrypted private messages.
 
 dependencies:
-  atomic_write:
-    github: chris-huxtable/atomic_write.cr
+  # atomic_write:
+  #   github: chris-huxtable/atomic_write.cr
   sodium:
     github: mixflame/sodium.cr
 
