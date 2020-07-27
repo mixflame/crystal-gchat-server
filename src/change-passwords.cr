@@ -33,7 +33,7 @@ module Globals
     puts "server file size limit (canvas, replay) in bytes (ie 10e+7 for 100 megabytes)"
     file_size_limit = gets.to_s.chomp.to_f64
 
-    File.atomic_write("config.yml") { |f| YAML.dump({
+    File.atomic_write(Path["~/.gchat_config.yml"].expand(home: true).to_s) { |f| YAML.dump({
       server_name:       server_name,
       port:              port,
       password:          password,

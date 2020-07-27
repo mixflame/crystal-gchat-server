@@ -175,20 +175,20 @@ class GlobalChatServer
         alpha = parr[7]
         width = parr[8]
         broadcast_message(io, "POINT", [x, y, dragging, red, green, blue, alpha, width, handle])
-        if File.exists?("buffer.txt")
-          @canvas_file_size = File.size("buffer.txt")
+        if File.exists?(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
+          @canvas_file_size = File.size(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
           if @canvas_file_size > @file_size_limit
             puts "canvas too large, pruning"
-            File.delete("buffer.txt")
+            File.delete(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
           end
         end
-        File.write("buffer.txt", "#{@points.last}\n", mode: "a")
+        File.write(Path["~/.gchat_buffer.txt"].expand(home: true).to_s, "#{@points.last}\n", mode: "a")
       elsif command == "GETPOINTS"
         send_points(io)
       elsif command == "CLEARCANVAS"
         return unless @admins.includes?(handle) # admin function
-        if File.exists?("buffer.txt")
-          File.delete("buffer.txt")
+        if File.exists?(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
+          File.delete(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
         end
         @points = [] of String
         broadcast_message(nil, "CLEARCANVAS", [handle])
@@ -239,7 +239,7 @@ class GlobalChatServer
   def delete_layers(handle)
     @points.reject! { |p| p.split("::!!::").last == handle }
 
-    File.write("buffer.txt", @points.join("\n"), mode: "w")
+    File.write(Path["~/.gchat_buffer.txt"].expand(home: true).to_s, @points.join("\n"), mode: "w")
   end
 
   def welcome_handle(io, handle)
@@ -379,16 +379,16 @@ class GlobalChatServer
   end
 
   def load_canvas_buffer
-    if File.exists?("buffer.txt")
-      @points = File.read("buffer.txt").chomp.split("\n")
+    if File.exists?(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
+      @points = File.read(Path["~/.gchat_buffer.txt"].expand(home: true).to_s).chomp.split("\n")
     end
   end
 
   def status
     passworded = (@password != "")
     scrollback = @scrollback
-    if File.exists?("buffer.txt")
-      @canvas_file_size = File.size("buffer.txt")
+    if File.exists?(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
+      @canvas_file_size = File.size(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
     else
       @canvas_file_size = 0.0
     end
@@ -450,10 +450,10 @@ class GlobalChatServer
   end
 
   def read_config
-    if File.exists?("config.yml")
-      puts "reading config from config.yml"
+    if File.exists?(Path["~/.gchat_config.yml"].expand(home: true).to_s)
+      puts "reading config from ~/.gchat_config.yml"
 
-      yaml = File.open("config.yml") do |file|
+      yaml = File.open(Path["~/.gchat_config.yml"].expand(home: true).to_s) do |file|
         YAML.parse(file)
       end
 
@@ -467,7 +467,7 @@ class GlobalChatServer
       @buffer_line_limit = yaml["buffer_line_limit"].as_i
       @file_size_limit = yaml["file_size_limit"].as_f
     else
-      puts "Use the change-password command to create config.yml"
+      puts "Use the change-password command to create ~/.gchat_config.yml"
     end
   end
 end
