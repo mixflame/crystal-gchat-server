@@ -12,6 +12,7 @@ apps:
     command: bin/crystal-gchat-server
     plugs:
       - network
+      - home
   change-passwords:
     command: bin/change-passwords
 
