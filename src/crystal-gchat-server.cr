@@ -364,11 +364,11 @@ class GlobalChatServer
     @server_keypair = Sodium::CryptoBox::SecretKey.new
     read_config
     load_canvas_buffer
+    status
+    @server = TCPServer.new("0.0.0.0", @port)
     unless @is_private == true
       ping_nexus(@server_name, @port)
     end
-    status
-    @server = TCPServer.new("0.0.0.0", @port)
     while client = @server.accept?
       spawn handle_client(client)
     end
@@ -444,7 +444,7 @@ class GlobalChatServer
   def nexus_offline
     if @published == true
       puts "Informing NexusNet that I have exited!!!"
-      response = HTTP::Client.get "https://nervous-shockley-ec99bc.netlify.app/.netlify/functions/msl/offline?port=#{port}"
+      response = HTTP::Client.get "https://nervous-shockley-ec99bc.netlify.app/.netlify/functions/msl/offline?port=#{@port}"
       @published = false
     end
   end
