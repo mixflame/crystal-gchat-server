@@ -36,6 +36,17 @@ class GlobalChatServer
   @file_size_limit = 2e+7
   @canvas_file_size = 0.0
 
+  def disclaimer
+    "You must be 18 or older to connect and chat on our services, or
+    have parental consent. Mindynamics and its affiliates are not responsible
+    for any bodily or mental harm that could possibly come from using its
+    services. Mindynamics is not responsible for any data received or sent
+    out to our clients. By connecting, you consent to have logging of your
+    conversations done by other clients and are also bound to the rules and
+    regulations that can be found at https://gdraw.chat/en/legal-info/eula/
+    "
+  end
+
   def handle_client(client)
     ip = client.remote_address.address.to_s
     if (@ban_length[ip]? && @ban_length[ip] > Time.utc)
@@ -87,6 +98,12 @@ class GlobalChatServer
       end
       if handle == nil || handle == ""
         send_message(io, "ALERT", ["You cannot have a blank name."])
+        # remove_dead_socket io
+        io.close
+        return
+      end
+      if handle == "Server Message"
+        send_message(io, "ALERT", ["Cannot use this name."])
         # remove_dead_socket io
         io.close
         return
@@ -243,6 +260,7 @@ class GlobalChatServer
   end
 
   def welcome_handle(io, handle)
+    say_encrypted(io, "Server Message", disclaimer)
     chat_token = Random.new.hex
     @handle_keys[chat_token] = handle
     @socket_keys[io] = chat_token
@@ -308,6 +326,18 @@ class GlobalChatServer
       #   remove_dead_socket socket
       # end
     end
+  end
+
+  def say_encrypted(socket, handle, message)
+      # begin
+      client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.decode(@client_pub_keys[socket.remote_address.to_s]))
+      encrypted_message = Base64.encode(client_pub_key.encrypt message)
+      output = "SAY::!!::#{handle}::!!::#{encrypted_message}"
+      sock_send(socket, output)
+      # rescue
+      #   log "broadcast fail removal event"
+      #   remove_dead_socket socket
+      # end
   end
 
   def broadcast(message, sender = nil)
