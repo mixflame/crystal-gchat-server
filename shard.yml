@@ -14,6 +14,8 @@ dependencies:
   #   github: chris-huxtable/atomic_write.cr
   sodium:
     github: mixflame/sodium.cr
+  obscenity-cr:
+    github: mixflame/obscenity-cr
 
 targets:
   crystal-gchat-server:

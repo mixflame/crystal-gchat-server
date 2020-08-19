@@ -7,6 +7,7 @@ require "crypto/bcrypt/password"
 require "big"
 require "sodium"
 require "base64"
+require "obscenity-cr"
 
 class GlobalChatServer
   @sockets = [] of TCPSocket
@@ -91,6 +92,11 @@ class GlobalChatServer
     if command == "SIGNON"
       handle = parr[1]
       encrypted_password = parr[2] if parr.size > 2
+      if Obscenity.profane?(handle)
+        send_message(io, "ALERT", ["You may not use an offensive name."])
+        io.close
+        return
+      end
       if @handles.includes?(handle)
         send_message(io, "ALERT", ["Your handle is in use."])
         io.close
@@ -150,7 +156,7 @@ class GlobalChatServer
         msg = parr[1]
         msg_bytes = Base64.decode(msg || "")
         plaintext = String.new(@server_keypair.decrypt msg_bytes)
-
+        plaintext = Obscenity.sanitize(plaintext) # no cursing in encrypted chat
         @buffer << [handle, plaintext]
         broadcast_say_encrypted(io, handle, plaintext)
       elsif command == "PING"
@@ -391,6 +397,10 @@ class GlobalChatServer
   end
 
   def initialize
+    Obscenity.configure -> (config : Obscenity::Config) {
+      config.blacklist   = :default
+      config.replacement = :garbled
+    }
     @server_keypair = Sodium::CryptoBox::SecretKey.new
     read_config
     load_canvas_buffer
