@@ -156,7 +156,10 @@ class GlobalChatServer
         msg = parr[1]
         msg_bytes = Base64.decode(msg || "")
         plaintext = String.new(@server_keypair.decrypt msg_bytes)
-        plaintext = Obscenity.sanitize(plaintext) # no cursing in encrypted chat
+        if Obscenity.profane?(plaintext)
+          plaintext = Obscenity.sanitize(plaintext) # no cursing in encrypted chat
+          say_encrypted(io, "Server Message", "The obscene words in your message were hidden to other users.")
+        end
         @buffer << [handle, plaintext]
         broadcast_say_encrypted(io, handle, plaintext)
       elsif command == "PING"
