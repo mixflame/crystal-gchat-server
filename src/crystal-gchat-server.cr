@@ -414,9 +414,7 @@ class GlobalChatServer
     load_canvas_buffer
     status
     @server = TCPServer.new("0.0.0.0", @port)
-    unless @is_private == true
-      ping_nexus(@server_name, @port)
-    end
+    ping_nexus(@server_name, @port, @is_private)
     while client = @server.accept?
       spawn handle_client(client)
     end
@@ -472,10 +470,14 @@ class GlobalChatServer
     return output
   end
 
-  def ping_nexus(chatnet_name, port)
+  def ping_nexus(chatnet_name, port, is_private)
     puts "Pinging NexusNet that I'm Online!!"
 
-    response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/online?name=#{chatnet_name}&port=#{port}"
+    response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/online?name=#{chatnet_name}&port=#{port}&is_private=#{is_private}"
+    if response.status_code == 403
+      puts "This server is banned."
+      exit
+    end
     @published = true
 
     Signal::INT.trap do
@@ -483,9 +485,6 @@ class GlobalChatServer
       exit
     end
 
-    at_exit do |status|
-      nexus_offline
-    end
   end
 
   # Tell Nexus I am no longer online
