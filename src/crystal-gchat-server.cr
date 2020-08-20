@@ -8,6 +8,7 @@ require "big"
 require "sodium"
 require "base64"
 require "obscenity-cr"
+require "linksafe"
 
 class GlobalChatServer
   @sockets = [] of TCPSocket
@@ -158,7 +159,11 @@ class GlobalChatServer
         plaintext = String.new(@server_keypair.decrypt msg_bytes)
         if Obscenity.profane?(plaintext)
           plaintext = Obscenity.sanitize(plaintext) # no cursing in encrypted chat
-          say_encrypted(io, "Server Message", "The obscene words in your message were hidden to other users.")
+          say_encrypted(io, "Server Message", "The obscene words in your message were hidden from other users.")
+        end
+        if plaintext != Linksafe.kosher_string!(plaintext)
+          plaintext = Linksafe.kosher_string!(plaintext)
+          say_encrypted(io, "Server Message", "Some links in your message were hidden from other users.")
         end
         @buffer << [handle, plaintext]
         broadcast_say_encrypted(io, handle, plaintext)

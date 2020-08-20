@@ -16,6 +16,8 @@ dependencies:
     github: mixflame/sodium.cr
   obscenity-cr:
     github: mixflame/obscenity-cr
+  linksafe:
+    github: mixflame/Linksafe.cr
 
 targets:
   crystal-gchat-server:
