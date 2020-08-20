@@ -470,7 +470,7 @@ class GlobalChatServer
   def ping_nexus(chatnet_name, port)
     puts "Pinging NexusNet that I'm Online!!"
 
-    response = HTTP::Client.get "https://nervous-shockley-ec99bc.netlify.app/.netlify/functions/msl/online?name=#{chatnet_name}&port=#{port}"
+    response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/online?name=#{chatnet_name}&port=#{port}"
     @published = true
 
     Signal::INT.trap do
@@ -487,7 +487,7 @@ class GlobalChatServer
   def nexus_offline
     if @published == true
       puts "Informing NexusNet that I have exited!!!"
-      response = HTTP::Client.get "https://nervous-shockley-ec99bc.netlify.app/.netlify/functions/msl/offline?port=#{@port}"
+      response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/offline?port=#{@port}"
       @published = false
     end
   end
