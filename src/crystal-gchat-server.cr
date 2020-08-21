@@ -51,9 +51,13 @@ class GlobalChatServer
 
   def check_all_users_for_global_ban
     @sockets.each do |socket|
-    send_message(socket, "ALERT", ["Server is refreshing..."])
-    socket.close
-    remove_dead_socket(socket)
+      ip = socket.remote_address.address.to_s
+      response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/banned?ip=#{ip}"
+      if response.status_code == 403
+        send_message(socket, "ALERT", ["Server is refreshing..."])
+        socket.close
+        remove_dead_socket(socket)
+      end
     end
   end
 
