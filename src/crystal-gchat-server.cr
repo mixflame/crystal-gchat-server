@@ -106,6 +106,7 @@ class GlobalChatServer
     parr = line.split("::!!::")
     command = parr[0]
     if command == "REFRESH"
+      puts "refreshing server"
       check_all_users_for_global_ban
       ping_nexus
       # download_filters
