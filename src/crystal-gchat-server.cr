@@ -51,7 +51,12 @@ class GlobalChatServer
 
   def check_all_users_for_global_ban
     @sockets.each do |socket|
-      check_global_ban(socket)
+      if check_global_ban(socket)
+        puts "denying globally banned ip"
+        send_message(socket, "ALERT", ["You are banned."])
+        socket.close
+        remove_dead_socket(socket)
+      end
     end
   end
 
@@ -60,10 +65,6 @@ class GlobalChatServer
     puts "checking to see if #{ip} is banned"
     response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/banned?ip=#{ip}"
     if response.status_code == 403
-      puts "denying globally banned ip"
-      send_message(client, "ALERT", ["You are banned."])
-      client.close
-      remove_dead_socket(client)
       return true
     else
       return false
@@ -74,7 +75,13 @@ class GlobalChatServer
 
     ip = client.remote_address.address.to_s
 
-    return if check_global_ban(client)
+    if check_global_ban(client)
+      puts "denying globally banned ip"
+      send_message(client, "ALERT", ["You are banned."])
+      client.close
+      remove_dead_socket(client)
+      return
+    end
 
     
     
