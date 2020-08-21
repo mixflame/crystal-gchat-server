@@ -61,9 +61,15 @@ class GlobalChatServer
     response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/banned?ip=#{ip}"
     if response.status_code == 403
       puts "denying globally banned ip"
-      send_message(client, "ALERT", ["You are banned."])
-      client.close
-      remove_dead_socket(client)
+      begin
+        send_message(client, "ALERT", ["You are banned."])
+        client.close
+        remove_dead_socket(client)
+      rescue
+        puts "failed to notify dead socket of ban"
+        client.close
+        remove_dead_socket(client)
+      end
     end
   end
 
