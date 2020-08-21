@@ -128,11 +128,11 @@ class GlobalChatServer
     # puts command
     if command == "SIGNON"
 
-      if check_global_ban(client)
+      if check_global_ban(io)
         puts "denying globally banned ip"
-        send_message(client, "ALERT", ["You are banned."])
-        client.close
-        remove_dead_socket(client)
+        send_message(io, "ALERT", ["You are banned."])
+        io.close
+        remove_dead_socket(io)
         return
       end
 
