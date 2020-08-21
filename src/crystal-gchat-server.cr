@@ -63,7 +63,7 @@ class GlobalChatServer
           remove_dead_socket(client)
           break
         end
-        sleep 1.hour
+        sleep 10.minutes
       end
     end
     
@@ -433,7 +433,7 @@ class GlobalChatServer
     spawn do
       while true
         ping_nexus(@server_name, @port, @is_private)
-        sleep 1.hour
+        sleep 10.minutes
       end
     end
     while client = @server.accept?
