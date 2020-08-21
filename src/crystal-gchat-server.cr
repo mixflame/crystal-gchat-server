@@ -108,7 +108,7 @@ class GlobalChatServer
     if command == "REFRESH"
       puts "refreshing server"
       check_all_users_for_global_ban
-      ping_nexus
+      ping_nexus(@server_name, @port, @is_private)
       # download_filters
       send_message(io, "REFRESHED", [""])
       return
