@@ -65,19 +65,24 @@ class GlobalChatServer
         send_message(client, "ALERT", ["You are banned."])
         client.close
         remove_dead_socket(client)
+        return true
       rescue
         puts "failed to notify dead socket of ban"
         client.close
         remove_dead_socket(client)
+        return true
       end
     end
+    return false
   end
 
   def handle_client(client)
 
-    check_global_ban(client)
-
     ip = client.remote_address.address.to_s
+
+    return if check_global_ban(client)
+
+    
     
     if (@ban_length[ip]? && @ban_length[ip] > Time.utc)
       puts "denying banned ip, time left: #{(@ban_length[ip] - Time.utc).to_i} seconds"
