@@ -51,12 +51,9 @@ class GlobalChatServer
 
   def check_all_users_for_global_ban
     @sockets.each do |socket|
-      if check_global_ban(socket)
-        puts "denying globally banned ip"
-        send_message(socket, "ALERT", ["You are banned."])
-        socket.close
-        remove_dead_socket(socket)
-      end
+    send_message(socket, "ALERT", ["Server is refreshing..."])
+    socket.close
+    remove_dead_socket(socket)
     end
   end
 
