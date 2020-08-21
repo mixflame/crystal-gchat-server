@@ -1,0 +1,14 @@
+version: 2.0
+shards:
+  linksafe:
+    git: https://github.com/mixflame/Linksafe.cr.git
+    version: 0.1.0+git.commit.b7cf3ae87b41c06f0c3e4e67e32bede223a20c25
+
+  obscenity-cr:
+    git: https://github.com/mixflame/obscenity-cr.git
+    version: 0.1.3+git.commit.3f6251dcb87b52234e9a312baa3a1ddd1f4fb6fe
+
+  sodium:
+    git: https://github.com/mixflame/sodium.cr.git
+    version: 1.2.0
+
