@@ -49,23 +49,29 @@ class GlobalChatServer
     "
   end
 
-  def handle_client(client)
-    ip = client.remote_address.address.to_s
-    
-    spawn do
-      while true
-        puts "checking to see if #{ip} is banned"
-        response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/banned?ip=#{ip}"
-        if response.status_code == 403
-          puts "denying globally banned ip"
-          send_message(client, "ALERT", ["You are banned."])
-          client.close
-          remove_dead_socket(client)
-          break
-        end
-        sleep 10.minutes
-      end
+  def check_all_users_for_global_ban
+    @sockets.each do |socket|
+      check_global_ban(socket)
     end
+  end
+
+  def check_global_ban(client)
+    ip = client.remote_address.address.to_s
+    puts "checking to see if #{ip} is banned"
+    response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/banned?ip=#{ip}"
+    if response.status_code == 403
+      puts "denying globally banned ip"
+      send_message(client, "ALERT", ["You are banned."])
+      client.close
+      remove_dead_socket(client)
+    end
+  end
+
+  def handle_client(client)
+
+    check_global_ban(client)
+
+    ip = client.remote_address.address.to_s
     
     if (@ban_length[ip]? && @ban_length[ip] > Time.utc)
       puts "denying banned ip, time left: #{(@ban_length[ip] - Time.utc).to_i} seconds"
@@ -430,12 +436,7 @@ class GlobalChatServer
     load_canvas_buffer
     status
     @server = TCPServer.new("0.0.0.0", @port)
-    spawn do
-      while true
-        ping_nexus(@server_name, @port, @is_private)
-        sleep 10.minutes
-      end
-    end
+    ping_nexus(@server_name, @port, @is_private)
     while client = @server.accept?
       spawn handle_client(client)
     end
