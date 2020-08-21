@@ -105,6 +105,12 @@ class GlobalChatServer
   def parse_line(line, io)
     parr = line.split("::!!::")
     command = parr[0]
+    if command == "REFRESH"
+      check_all_users_for_global_ban
+      ping_nexus
+      # download_filters
+    end
+
     if command == "KEY"
       @client_pub_keys[io.remote_address.to_s] = parr[1]
       server_pub_key = Base64.encode(@server_keypair.public_key.to_slice)
