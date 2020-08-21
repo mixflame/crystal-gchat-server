@@ -53,6 +53,7 @@ class GlobalChatServer
     @sockets.each do |socket|
       ip = socket.remote_address.address.to_s
       response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/banned?ip=#{ip}"
+      puts "response code: #{response.status_code}"
       if response.status_code == 403
         send_message(socket, "ALERT", ["Server is refreshing..."])
         socket.close
