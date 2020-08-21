@@ -51,14 +51,20 @@ class GlobalChatServer
 
   def handle_client(client)
     ip = client.remote_address.address.to_s
-    puts "checking to see if #{ip} is banned"
-    response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/banned?ip=#{ip}"
-    if response.status_code == 403
-      puts "denying globally banned ip"
-      send_message(client, "ALERT", ["You are banned."])
-      client.close
-      remove_dead_socket(client)
-      return
+    
+    spawn do
+      while true
+        puts "checking to see if #{ip} is banned"
+        response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/banned?ip=#{ip}"
+        if response.status_code == 403
+          puts "denying globally banned ip"
+          send_message(client, "ALERT", ["You are banned."])
+          client.close
+          remove_dead_socket(client)
+          break
+        end
+        sleep 1.hour
+      end
     end
     
     if (@ban_length[ip]? && @ban_length[ip] > Time.utc)
