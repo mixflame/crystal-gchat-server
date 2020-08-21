@@ -109,6 +109,7 @@ class GlobalChatServer
       check_all_users_for_global_ban
       ping_nexus
       # download_filters
+      return
     end
 
     if command == "KEY"
