@@ -414,7 +414,12 @@ class GlobalChatServer
     load_canvas_buffer
     status
     @server = TCPServer.new("0.0.0.0", @port)
-    ping_nexus(@server_name, @port, @is_private)
+    spawn do
+      while true
+        ping_nexus(@server_name, @port, @is_private)
+        sleep 3600
+      end
+    end
     while client = @server.accept?
       spawn handle_client(client)
     end
