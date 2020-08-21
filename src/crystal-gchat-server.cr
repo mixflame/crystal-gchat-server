@@ -123,6 +123,7 @@ class GlobalChatServer
       ping_nexus(@server_name, @port, @is_private)
       # download_filters
       send_message(io, "REFRESHED", [""])
+      io.close
       return
     end
 
