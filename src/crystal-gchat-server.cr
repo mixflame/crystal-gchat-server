@@ -520,6 +520,7 @@ class GlobalChatServer
 
     response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/online?name=#{chatnet_name}&port=#{port}&is_private=#{is_private}"
     puts "nexus response code #{response.status_code}"
+    puts "nexus response #{response.body}"
     if response.status_code == 403
       puts "This server is banned."
       exit
