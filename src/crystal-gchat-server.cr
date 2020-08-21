@@ -417,7 +417,7 @@ class GlobalChatServer
     spawn do
       while true
         ping_nexus(@server_name, @port, @is_private)
-        sleep 3600
+        sleep 1.hour
       end
     end
     while client = @server.accept?
