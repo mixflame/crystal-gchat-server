@@ -87,7 +87,7 @@ class GlobalChatServer
 
   def message_matches_filters(message)
     @filters.each do |filter|
-      if message.match(filter)
+      if message.match(/#{filter}/i)
         puts "banned message detected"
         return true
       end
