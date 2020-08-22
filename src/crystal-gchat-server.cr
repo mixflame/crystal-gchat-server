@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.4.3"
+  VERSION = "1.4.4"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -55,7 +55,7 @@ class GlobalChatServer
   end
 
   def submit_content_report(handle, ip, text)
-    response = HTTP::Client.post "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/report?ip=#{ip}&handle=#{handle}", {text: text}
+    response = HTTP::Client.post(url: "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/report?ip=#{ip}&handle=#{handle}", body: text)
     puts "response body: #{response.body}"
     if response.status_code == 200
       return true
@@ -262,10 +262,8 @@ class GlobalChatServer
       elsif command == "REPORT"
         handle_being_reported = parr[1]
         msg = parr[2]
-        msg_bytes = Base64.decode(msg || "")
-        plaintext = String.new(@server_keypair.decrypt msg_bytes)
         ip = @ip_by_handle[handle_being_reported]
-        if submit_content_report(handle_being_reported, ip, plaintext)
+        if submit_content_report(handle_being_reported, ip, msg)
           say_encrypted(io, "Server Message", "You successfully reported #{handle}")
         else
           say_encrypted(io, "Server Message", "Your report wasn't submitted. Please try again.")
