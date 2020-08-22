@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.3.4"
+  VERSION = "1.3.5"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -90,8 +90,7 @@ class GlobalChatServer
 
   def message_matches_filters(message)
     @filters.each do |filter|
-      info = filter.gsub("FILTER::!!:::", "")
-      if message.match(/#{info}/i)
+      if message.downcase.includes?(filter.downcase)
         puts "banned message detected"
         return true
       end
@@ -490,6 +489,7 @@ class GlobalChatServer
     @server = TCPServer.new("0.0.0.0", @port)
     status
     ping_nexus(@server_name, @port, @is_private)
+    download_filters
     while client = @server.accept?
       spawn handle_client(client)
     end
