@@ -55,7 +55,7 @@ class GlobalChatServer
   end
 
   def submit_content_report(handle, ip, text)
-    response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/report?ip=#{ip}&handle=#{handle}&text=#{text}"
+    response = HTTP::Client.post "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/report?ip=#{ip}&handle=#{handle}", {text: text}
     puts "response body: #{response.body}"
     if response.status_code == 200
       return true
