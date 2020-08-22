@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.4.2"
+  VERSION = "1.4.3"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
