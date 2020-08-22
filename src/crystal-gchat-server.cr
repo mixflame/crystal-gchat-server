@@ -80,10 +80,9 @@ class GlobalChatServer
   def download_filters
     puts "downloading filters"
     response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/filters"
-    filters = response.body.split("\n")
+    filters = response.body.split("\r\n\r\n")
     filters.each do |filter|
-      info = filter.gsub("FILTER::!!:::", "")
-      @filters << info
+      @filters << filter
     end
     puts "filters: #{@filters}"
   end
