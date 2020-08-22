@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.4.0"
+  VERSION = "1.4.1"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -41,6 +41,7 @@ class GlobalChatServer
   @file_size_limit = 2e+7
   @canvas_file_size = 0.0
   @filters = [] of String
+  @ip_by_handle = {} of String => String
 
   def disclaimer
     "You must be 18 or older to connect and chat on our services, or
@@ -51,6 +52,15 @@ class GlobalChatServer
     conversations done by other clients and are also bound to the rules and
     regulations that can be found at https://gdraw.chat/en/legal-info/eula/
     "
+  end
+
+  def submit_content_report(handle, ip, text)
+    response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/report?ip=#{ip}&handle=#{handle}&text=#{text}"
+    if response.status_code == 200
+      return true
+    else
+      return false
+    end
   end
 
   def check_all_users_for_global_ban
@@ -168,6 +178,7 @@ class GlobalChatServer
       end
 
       handle = parr[1]
+      @ip_by_handle[handle] = io.remote_address.address.to_s
       encrypted_password = parr[2] if parr.size > 2
       if Obscenity.profane?(handle)
         send_message(io, "ALERT", ["You may not use an offensive name."])
@@ -247,6 +258,17 @@ class GlobalChatServer
         end
         @buffer << [handle, plaintext]
         broadcast_say_encrypted(io, handle, plaintext)
+      elsif command == "REPORT"
+        handle_being_reported = parr[1]
+        msg = parr[2]
+        msg_bytes = Base64.decode(msg || "")
+        plaintext = String.new(@server_keypair.decrypt msg_bytes)
+        ip = @ip_by_handle[handle_being_reported]
+        if submit_content_report(handle_being_reported, ip, plaintext)
+          say_encrypted(io, "Server Message", "You successfully reported #{handle}")
+        else
+          say_encrypted(io, "Server Message", "Your report wasn't submitted. Please try again.")
+        end
       elsif command == "PING"
         unless @handles.includes?(handle)
           @handles << handle
