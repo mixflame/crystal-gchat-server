@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.3.8"
+  VERSION = "1.3.9"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -89,6 +89,7 @@ class GlobalChatServer
       @filters = new_filters
       puts "filters: #{@filters}"
       buffer = build_chat_log
+      broadcast_message(nil, "CLEARTEXT", [] of String)
       broadcast_buffer_encrypted(buffer)
     end
   end
