@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.3.9"
+  VERSION = "1.4.0"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -85,7 +85,7 @@ class GlobalChatServer
     filters.each do |filter|
       new_filters << filter if filter != "" && !@filters.includes?(filter)
     end
-    if @filters != new_filters
+    if @filters != new_filters && !new_filters.empty?
       @filters = new_filters
       puts "filters: #{@filters}"
       buffer = build_chat_log
