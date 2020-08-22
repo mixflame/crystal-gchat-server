@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.4.1"
+  VERSION = "1.4.2"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -56,6 +56,7 @@ class GlobalChatServer
 
   def submit_content_report(handle, ip, text)
     response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/report?ip=#{ip}&handle=#{handle}&text=#{text}"
+    puts "response body: #{response.body}"
     if response.status_code == 200
       return true
     else
