@@ -11,6 +11,9 @@ require "obscenity-cr"
 require "linksafe"
 
 class GlobalChatServer
+
+  VERSION = "1.3.4"
+
   @sockets = [] of TCPSocket
   @handles = [] of String
   @handle_keys = {} of String => String         # stores handle
@@ -87,7 +90,8 @@ class GlobalChatServer
 
   def message_matches_filters(message)
     @filters.each do |filter|
-      if message.match(/#{filter}/i)
+      info = filter.gsub("FILTER::!!:::", "")
+      if message.match(/#{info}/i)
         puts "banned message detected"
         return true
       end
@@ -483,8 +487,8 @@ class GlobalChatServer
     @server_keypair = Sodium::CryptoBox::SecretKey.new
     read_config
     load_canvas_buffer
-    status
     @server = TCPServer.new("0.0.0.0", @port)
+    status
     ping_nexus(@server_name, @port, @is_private)
     while client = @server.accept?
       spawn handle_client(client)
@@ -502,6 +506,7 @@ class GlobalChatServer
   end
 
   def status
+    puts "crystal-gchat-server #{VERSION}"
     passworded = (@password != "")
     scrollback = @scrollback
     if File.exists?(Path["~/.gchat_buffer.txt"].expand(home: true).to_s)
@@ -510,7 +515,7 @@ class GlobalChatServer
       @canvas_file_size = 0.0
     end
     log "Canvas size: #{@canvas_file_size} Limit #{@file_size_limit}"
-    log "#{@server_name} running on GlobalChat2 platform Replay:#{scrollback} Passworded:#{passworded}"
+    log "#{@server_name} 0.0.0.0:#{@port} running on GlobalChat2 platform Replay:#{scrollback} Passworded:#{passworded}"
   end
 
   def log(msg)
