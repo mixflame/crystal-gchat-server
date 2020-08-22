@@ -427,7 +427,7 @@ class GlobalChatServer
       client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.decode(@client_pub_keys[socket.remote_address.to_s]))
       encrypted_message = Base64.encode(client_pub_key.encrypt buffer)
       output = "BUFFER::!!::#{encrypted_message}"
-      sock_send(socket, output) unless socket == sender
+      sock_send(socket, output)
       # rescue
       #   log "broadcast fail removal event"
       #   remove_dead_socket socket
