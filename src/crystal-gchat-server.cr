@@ -37,6 +37,7 @@ class GlobalChatServer
   @ban_length = {} of String => Time
   @file_size_limit = 2e+7
   @canvas_file_size = 0.0
+  @filters = [] of String
 
   def disclaimer
     "You must be 18 or older to connect and chat on our services, or
@@ -71,6 +72,27 @@ class GlobalChatServer
     else
       return false
     end
+  end
+
+  def download_filters
+    puts "downloading filters"
+    response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/filters"
+    filters = response.body.split("\n")
+    filters.each do |filter|
+      info = filter.gsub("FILTER::!!:::", "")
+      @filters << info
+    end
+    puts "filters: #{@filters}"
+  end
+
+  def message_matches_filters(message)
+    @filters.each do |filter|
+      if message.match(filter)
+        puts "banned message detected"
+        return true
+      end
+    end
+    return false
   end
 
   def handle_client(client)
@@ -113,7 +135,7 @@ class GlobalChatServer
       puts "refreshing server"
       check_all_users_for_global_ban
       ping_nexus(@server_name, @port, @is_private)
-      # download_filters
+      download_filters
       send_message(io, "REFRESHED", [""])
       io.close
       return
@@ -209,6 +231,10 @@ class GlobalChatServer
         if plaintext != Linksafe.kosher_string!(plaintext)
           plaintext = Linksafe.kosher_string!(plaintext)
           say_encrypted(io, "Server Message", "Some links in your message were hidden from other users.")
+        end
+        if message_matches_filters(plaintext)
+          say_encrypted(io, "Server Message", "Your message matched a filter and was hidden from other users.")
+          return
         end
         @buffer << [handle, plaintext]
         broadcast_say_encrypted(io, handle, plaintext)
@@ -510,7 +536,7 @@ class GlobalChatServer
     output = ""
     displayed_buffer = @buffer.size > @buffer_line_limit ? @buffer[@buffer.size - @buffer_line_limit..-1] : @buffer
     displayed_buffer.each do |msg|
-      output += "#{msg[0]}: #{msg[1]}\n"
+      output += "#{msg[0]}: #{msg[1]}\n" if !message_matches_filters(msg[1])
     end
     return output
   end
