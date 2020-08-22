@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.4.4"
+  VERSION = "1.4.5"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -262,8 +262,10 @@ class GlobalChatServer
       elsif command == "REPORT"
         handle_being_reported = parr[1]
         msg = parr[2]
+        msg_bytes = Base64.decode(msg || "")
+        plaintext = String.new(@server_keypair.decrypt msg_bytes)
         ip = @ip_by_handle[handle_being_reported]
-        if submit_content_report(handle_being_reported, ip, msg)
+        if submit_content_report(handle_being_reported, ip, plaintext)
           say_encrypted(io, "Server Message", "You successfully reported #{handle}")
         else
           say_encrypted(io, "Server Message", "Your report wasn't submitted. Please try again.")
