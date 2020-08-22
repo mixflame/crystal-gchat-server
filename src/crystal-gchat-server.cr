@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.3.6"
+  VERSION = "1.3.7"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -81,10 +81,16 @@ class GlobalChatServer
     puts "downloading filters"
     response = HTTP::Client.get "https://wonderful-heyrovsky-0c77d0.netlify.app/.netlify/functions/msl/filters"
     filters = response.body.split("\r\n\r\n")
+    new_filters = [] of String
     filters.each do |filter|
-      @filters << filter
+      new_filters << filter if filter != "" && !filters.includes?(filter)
     end
-    puts "filters: #{@filters}"
+    if @filters != new_filters
+      @filters = new_filters
+      puts "filters: #{@filters}"
+      buffer = build_chat_log
+      broadcast_buffer_encrypted(buffer)
+    end
   end
 
   def message_matches_filters(message)
@@ -407,6 +413,20 @@ class GlobalChatServer
       client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.decode(@client_pub_keys[socket.remote_address.to_s]))
       encrypted_message = Base64.encode(client_pub_key.encrypt message)
       output = "SAY::!!::#{handle}::!!::#{encrypted_message}"
+      sock_send(socket, output) unless socket == sender
+      # rescue
+      #   log "broadcast fail removal event"
+      #   remove_dead_socket socket
+      # end
+    end
+  end
+
+  def broadcast_buffer_encrypted(buffer)
+    @sockets.each do |socket|
+      # begin
+      client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.decode(@client_pub_keys[socket.remote_address.to_s]))
+      encrypted_message = Base64.encode(client_pub_key.encrypt buffer)
+      output = "BUFFER::!!::#{encrypted_message}"
       sock_send(socket, output) unless socket == sender
       # rescue
       #   log "broadcast fail removal event"
