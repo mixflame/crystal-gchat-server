@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.3.7"
+  VERSION = "1.3.8"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -83,7 +83,7 @@ class GlobalChatServer
     filters = response.body.split("\r\n\r\n")
     new_filters = [] of String
     filters.each do |filter|
-      new_filters << filter if filter != "" && !filters.includes?(filter)
+      new_filters << filter if filter != "" && !@filters.includes?(filter)
     end
     if @filters != new_filters
       @filters = new_filters
