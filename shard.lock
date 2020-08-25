@@ -6,7 +6,7 @@ shards:
 
   obscenity-cr:
     git: https://github.com/mixflame/obscenity-cr.git
-    version: 0.1.4+git.commit.210ad1af7298f2033eff9c44ce72e69b2e0ee508
+    version: 0.1.4+git.commit.66a0cd74e8b7e20d131013fdb90a82411a684909
 
   sodium:
     git: https://github.com/mixflame/sodium.cr.git
