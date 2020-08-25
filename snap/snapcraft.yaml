@@ -1,5 +1,5 @@
 name: crystal-gchat-server
-version: "1.4.7"
+version: "1.4.8"
 summary: Crystal Lang GlobalChat2 Server
 description: Custom encrypted chat with live drawing
 
