@@ -386,7 +386,10 @@ class GlobalChatServer
     @handles << handle
     @sockets << io
     send_message(io, "TOKEN", [chat_token, handle, @server_name])
-    say_encrypted(io, "Server Message", disclaimer)
+    spawn do
+      sleep 1.second
+      say_encrypted(io, "Server Message", disclaimer)
+    end
     send_message(io, "CANVAS", [@canvas_size, @points.size])
     broadcast_message(io, "JOIN", [handle])
   end
