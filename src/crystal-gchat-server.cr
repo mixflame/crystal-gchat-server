@@ -12,7 +12,7 @@ require "linksafe"
 
 class GlobalChatServer
 
-  VERSION = "1.4.8"
+  VERSION = "1.4.9"
 
   @sockets = [] of TCPSocket
   @handles = [] of String
@@ -377,7 +377,6 @@ class GlobalChatServer
   end
 
   def welcome_handle(io, handle)
-    say_encrypted(io, "Server Message", disclaimer)
     chat_token = Random.new.hex
     @handle_keys[chat_token] = handle
     @socket_keys[io] = chat_token
@@ -387,6 +386,7 @@ class GlobalChatServer
     @handles << handle
     @sockets << io
     send_message(io, "TOKEN", [chat_token, handle, @server_name])
+    say_encrypted(io, "Server Message", disclaimer)
     send_message(io, "CANVAS", [@canvas_size, @points.size])
     broadcast_message(io, "JOIN", [handle])
   end
