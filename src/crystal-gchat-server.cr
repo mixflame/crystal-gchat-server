@@ -163,7 +163,7 @@ class GlobalChatServer
 
     if command == "KEY"
       @client_pub_keys[io.remote_address.to_s] = parr[1]
-      server_pub_key = Base64.encode(@server_keypair.public_key.to_slice)
+      server_pub_key = Base64.strict_(@server_keypair.public_key.to_slice)
       send_message(io, "KEY", [server_pub_key])
       return
     end
@@ -205,7 +205,7 @@ class GlobalChatServer
       end
       plaintext = ""
       if encrypted_password != nil
-        password_bytes = Base64.decode(encrypted_password || "")
+        password_bytes = Base64.strict_decode(encrypted_password || "")
         plaintext = String.new(@server_keypair.decrypt password_bytes)
       else
         plaintext = ""
@@ -237,13 +237,13 @@ class GlobalChatServer
         send_message(io, "HANDLES", [build_handle_list])
       elsif command == "GETBUFFER"
         buffer = build_chat_log
-        client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.decode(@client_pub_keys[io.remote_address.to_s]))
-        encrypted_message = Base64.encode(client_pub_key.encrypt buffer)
+        client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.strict_decode(@client_pub_keys[io.remote_address.to_s]))
+        encrypted_message = Base64.strict_(client_pub_key.encrypt buffer)
 
         send_message(io, "BUFFER", [encrypted_message])
       elsif command == "MESSAGE"
         msg = parr[1]
-        msg_bytes = Base64.decode(msg || "")
+        msg_bytes = Base64.strict_decode(msg || "")
         plaintext = String.new(@server_keypair.decrypt msg_bytes)
         if Obscenity.profane?(plaintext)
           plaintext = Obscenity.sanitize(plaintext) # no cursing in encrypted chat
@@ -262,7 +262,7 @@ class GlobalChatServer
       elsif command == "REPORT"
         handle_being_reported = parr[1]
         msg = parr[2]
-        msg_bytes = Base64.decode(msg || "")
+        msg_bytes = Base64.strict_decode(msg || "")
         plaintext = String.new(@server_keypair.decrypt msg_bytes)
         ip = @ip_by_handle[handle_being_reported]
         if submit_content_report(handle_being_reported, ip, plaintext)
@@ -434,8 +434,8 @@ class GlobalChatServer
   def broadcast_say_encrypted(sender, handle, message)
     @sockets.each do |socket|
       # begin
-      client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.decode(@client_pub_keys[socket.remote_address.to_s]))
-      encrypted_message = Base64.encode(client_pub_key.encrypt message)
+      client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.strict_decode(@client_pub_keys[socket.remote_address.to_s]))
+      encrypted_message = Base64.strict_encode(client_pub_key.encrypt message)
       output = "SAY::!!::#{handle}::!!::#{encrypted_message}"
       sock_send(socket, output) unless socket == sender
       # rescue
@@ -448,8 +448,8 @@ class GlobalChatServer
   def broadcast_buffer_encrypted(buffer)
     @sockets.each do |socket|
       # begin
-      client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.decode(@client_pub_keys[socket.remote_address.to_s]))
-      encrypted_message = Base64.encode(client_pub_key.encrypt buffer)
+      client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.strict_decode(@client_pub_keys[socket.remote_address.to_s]))
+      encrypted_message = Base64.strict_encode(client_pub_key.encrypt buffer)
       output = "BUFFER::!!::#{encrypted_message}"
       sock_send(socket, output)
       # rescue
@@ -461,8 +461,8 @@ class GlobalChatServer
 
   def say_encrypted(socket, handle, message)
       # begin
-      client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.decode(@client_pub_keys[socket.remote_address.to_s]))
-      encrypted_message = Base64.encode(client_pub_key.encrypt message)
+      client_pub_key = Sodium::CryptoBox::PublicKey.new(Base64.strict_decode(@client_pub_keys[socket.remote_address.to_s]))
+      encrypted_message = Base64.strict_encode(client_pub_key.encrypt message)
       output = "SAY::!!::#{handle}::!!::#{encrypted_message}"
       sock_send(socket, output)
       # rescue
